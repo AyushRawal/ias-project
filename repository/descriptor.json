@@ -1,0 +1,15 @@
+{
+    "environment": {},
+    "dependencies": [
+      "flask",
+      "gunicorn",
+      "kafka-python"
+    ],
+    "port": 5002,
+    "app_module": "app:app",
+    "init_module": null,
+    "kafka_broker": "10.1.37.28:9092",
+    "kafka_log_topic": "logs",
+    "kafka_cmd_topic": "repository_commands"
+  }
+  
