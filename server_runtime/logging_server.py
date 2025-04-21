@@ -58,7 +58,7 @@ class LoggingServer:
         init_mod = self.config.get("init_module")
         if init_mod:
             pkg, fn = init_mod.split(":")
-            cmd = ["env/bin/python", "-c", f"import {pkg}; {fn}()"]
+            cmd = ["env/bin/python", "-c", f"import {pkg}; {pkg}.{fn}()"]
             try:
                 subprocess.run(cmd, cwd=self.app_dir, check=True)
             except subprocess.CalledProcessError as e:
