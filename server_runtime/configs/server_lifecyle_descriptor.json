@@ -1,0 +1,13 @@
+{
+    "environment": {
+      "DEBUG": "True"
+    },
+    "dependencies": [
+      "fastapi",
+      "uvicorn"
+    ],
+    "port": 8000,
+    "api_module": "fastapi_lifecycle:app",
+    "workers": 2
+  }
+  

@@ -1,0 +1,12 @@
+{
+    "environment": {
+      "DEBUG": "True",
+      "EXAMPLE_VAR": "some_value"
+    },
+    "dependencies": [
+      "gunicorn",
+      "flask"
+    ],
+    "port": 8080,
+    "app_module": "app:app"
+}  
