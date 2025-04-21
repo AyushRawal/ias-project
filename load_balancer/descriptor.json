@@ -1,0 +1,14 @@
+{
+    "environment": {},
+    "dependencies": [
+      "flask",
+      "requests",
+      "gunicorn"
+    ],
+    "port": 5015,
+    "app_module": "app:app",
+    "init_module": null,
+    "registry_host": "localhost",
+    "registry_port": 5001
+  }
+  
