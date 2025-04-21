@@ -30,7 +30,7 @@ KAFKA_TOPIC = CONFIG.get("kafka_topic", "logs")
 KAFKA_GROUP = CONFIG.get("kafka_group", "log_consumer_group")
 
 # Where to store files
-NFS_DIRECTORY = CONFIG.get("nfs_directory", "/home/orion/data/ias_nfs/system_logs")
+NFS_DIRECTORY = CONFIG.get("nfs_directory", "/home/orion/data/ias_nfs") + "/logs"
 
 
 def init_consumer():
