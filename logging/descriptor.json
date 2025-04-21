@@ -1,0 +1,14 @@
+{
+    "environment": {},
+    "dependencies": [
+        "kafka-python"
+    ],
+    "init_module": "app:init_consumer",
+    "app_module": "app:run",
+    "nfs_directory": "/home/orion/data/ias_nfs/system_logs",
+    "kafka_broker": [
+        "10.1.37.28:9092"
+    ],
+    "kafka_topic": "logs",
+    "kafka_group_id": "log_consumer_group"
+}
