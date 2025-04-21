@@ -68,7 +68,7 @@ class LoggingServer:
         # 2) run the main app
         app_mod = self.config.get("app_module", "app:run")
         pkg, fn = app_mod.split(":")
-        cmd = ["env/bin/python", "-u", "-c", f"import {pkg}; {fn}()"]
+        cmd = ["env/bin/python", "-u", "-c", f"import {pkg}; {pkg}.{fn}()"]
         self.logger.info(f"Launching consumer: {' '.join(cmd)}")
         proc = subprocess.Popen(cmd, cwd=self.app_dir)
 
