@@ -1,0 +1,19 @@
+{
+    "dependencies": [
+        "kafka-python",
+        "confluent-kafka"
+    ],
+    "Kafka_Bootstrap_Server": "10.1.37.28:9092",
+    "Kafka_Provision_VM_Topic": "Provision_VM",
+    "Kafka_Provision_VM_Consumer_Group_Id": "Provision_VM_Group",
+    "Kafka_Stop_VM_Topic": "Stop_VM",
+    "Kafka_Stop_VM_Consumer_Group_Id": "Stop_VM_Group",
+    "Kafka_Destroy_VM_Topic": "Destroy_VM",
+    "Kafka_Destroy_VM_Consumer_Group_Id": "Destroy_VM_Group",
+    "Kafka_Registry_Service_Topic": "Registry_Service",
+    "Kafka_Logs_Topic": "logs",
+    "NFS_Server_IP_Address": "10.1.37.28",
+    "NFS_Remote_Path": "/srv/nfs",
+    "NFS_Local_Mount": "nfs",
+    "VM_Agent_Port": "5000"
+}
