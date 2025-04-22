@@ -24,7 +24,7 @@ KAFKA_BROKER = CONFIG.get("kafka_broker", "10.1.37.28:9092")
 LOG_TOPIC = CONFIG.get("kafka_log_topic", "logs")
 CMD_TOPIC = CONFIG.get("kafka_cmd_topic", "repository_commands")
 VERSIONED_ROOT = CONFIG.get("nfs_path", HERE)
-VERSIONED_ROOT = os.path.join(VERSIONED_ROOT, "..", "versioned_models")
+VERSIONED_ROOT = os.path.join(VERSIONED_ROOT, "repository", "versioned_models")
 # ——— Logging setup ————————————————————————————————————————
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"
