@@ -92,7 +92,7 @@ def run_inference_server(
     # Copy files from NFS share to local directories
     # repo = os.path.join(NFS_LOCAL_DIR, "repository", "versioned_models")
     app_nfs_path = "/home/vagrant/nfs/repository/versioned_models/my_app/release/v1.0/inference"
-    model_nfs_path = "/home/vagrant/nfs/repository/versioned_models/my_app/release/v1.0/inference/model.pt"
+    model_nfs_path = "/home/vagrant/nfs/repository/versioned_models/my_app/models/model.pt"
 
     # app_nfs_path = os.path.join(repo, name, "inference")
     # model_nfs_path = os.path.join(repo, name, "model.pt")
