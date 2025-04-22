@@ -1,12 +1,11 @@
 import json
+import logging
 import os
 import subprocess
-import logging
-from kafka_utils import KafkaLogger, KafkaOutputRedirector
 
 
 class ServerLifeCycleServer:
-    def __init__(self, app_dir, kafka_broker=None, kafka_topic_prefix=None):
+    def __init__(self, app_dir):
         self.app_dir = app_dir
         self.config = self._load_config()
         self.server_name = self.__class__.__name__
@@ -15,19 +14,6 @@ class ServerLifeCycleServer:
             format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
         )
         self.logger = logging.getLogger(self.server_name)
-        self.kafka_broker = kafka_broker
-        self.kafka_topic_prefix = kafka_topic_prefix
-        self.kafka_logger = None
-        self.output_redirector = None
-
-        # Initialize Kafka logger if broker is provided
-        if self.kafka_broker:
-            self.kafka_logger = KafkaLogger(
-                server_name=self.server_name,
-                broker=self.kafka_broker,
-                topic_prefix=self.kafka_topic_prefix or "server_logs",
-                logger=self.logger
-            )
 
     def _verify_app_directory(self):
         """Verify that the application directory exists and has required files"""
@@ -50,7 +36,11 @@ class ServerLifeCycleServer:
             self.logger.info(f"Installing dependencies: {', '.join(dependencies)}")
             try:
                 subprocess.run(["python", "-m", "venv", "env"], cwd=self.app_dir)
-                subprocess.run(["env/bin/python", "-m", "pip", "install", "-q"] + dependencies, check=True, cwd=self.app_dir)
+                subprocess.run(
+                    ["env/bin/python", "-m", "pip", "install", "-q"] + dependencies,
+                    check=True,
+                    cwd=self.app_dir,
+                )
             except subprocess.CalledProcessError as e:
                 self.logger.error(f"Failed to install dependencies: {e}")
                 return False
@@ -68,27 +58,19 @@ class ServerLifeCycleServer:
             return {}
 
     def start(self):
-        """Start the inference API server"""
+        """Start the Lifecycle server"""
         self.logger.info("Starting Server Lifecycle Manager")
 
         if not self._verify_app_directory() or not self._setup_environment():
             return -1
 
         # Set up model path and server configuration
-        api_module = self.config.get("api_module", "api:app")
-        port = self.config.get("port", 8000)
-        workers = self.config.get("workers", 1)
+        app_module = self.config.get("main_module", "app.py")
 
         try:
             cmd = [
-                "env/bin/uvicorn",
-                api_module,
-                "--host",
-                "0.0.0.0",
-                "--port",
-                str(port),
-                "--workers",
-                str(workers),
+                "env/bin/python",
+                app_module,
             ]
 
             # Start the server as a subprocess
@@ -97,17 +79,7 @@ class ServerLifeCycleServer:
                 cmd, cwd=self.app_dir, stdout=subprocess.PIPE, stderr=subprocess.PIPE
             )
 
-            # Set up Kafka output redirection if Kafka logger is available
-            if self.kafka_logger:
-                self.output_redirector = KafkaOutputRedirector(
-                    server_name=self.server_name,
-                    process=proc,
-                    kafka_logger=self.kafka_logger
-                )
-                self.output_redirector.start_redirection()
-                self.logger.info("Process output being redirected to Kafka")
-
-            self.logger.info(f"Server Lifecycle Manager started on port {port}")
+            self.logger.info(f"Server Lifecycle Manager started")
             return proc.pid
 
         except Exception as e:
@@ -122,31 +94,10 @@ if __name__ == "__main__":
     parser.add_argument(
         "--app-dir", required=True, help="Path to the application directory"
     )
-    parser.add_argument(
-        "--kafka-broker",
-        default="10.1.37.28:9092",
-        help="Kafka broker address for output redirection"
-    )
-    parser.add_argument(
-        "--kafka-topic-prefix",
-        default="server_logs",
-        help="Prefix for Kafka topics"
-    )
-    parser.add_argument(
-        "--no-kafka",
-        action="store_true",
-        help="Disable Kafka output redirection"
-    )
-
     args = parser.parse_args()
-
-    # Only use Kafka if not explicitly disabled
-    kafka_broker = None if args.no_kafka else args.kafka_broker
 
     server = ServerLifeCycleServer(
         app_dir=args.app_dir,
-        kafka_broker=kafka_broker,
-        kafka_topic_prefix=args.kafka_topic_prefix,
     )
 
     pid = server.start()

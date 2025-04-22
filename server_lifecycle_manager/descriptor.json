@@ -3,6 +3,7 @@
         "kafka-python",
         "confluent-kafka"
     ],
+    "main_module": "app.py",
     "Kafka_Bootstrap_Server": "10.1.37.28:9092",
     "Kafka_Provision_VM_Topic": "Provision_VM",
     "Kafka_Provision_VM_Consumer_Group_Id": "Provision_VM_Group",
