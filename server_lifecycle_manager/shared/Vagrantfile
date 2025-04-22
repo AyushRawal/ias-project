@@ -64,7 +64,7 @@ Vagrant.configure("2") do |config|
     apt update
     apt install -y nfs-common python3-venv
     python3 -m venv /home/vagrant/agent_deployment/env
-    /home/vagrant/agent_deployment/env/bin/pip install flask kafka-python confluent-kafka
+    /home/vagrant/agent_deployment/env/bin/pip install flask kafka-python
     sudo bash -c 'cat > /etc/systemd/system/agent.service <<EOF
 [Unit]
 Description=Agent
