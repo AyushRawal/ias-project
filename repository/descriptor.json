@@ -11,6 +11,6 @@
     "kafka_broker": "10.1.37.28:9092",
     "kafka_log_topic": "logs",
     "kafka_cmd_topic": "repository_commands",
-    "nfs_path": "~/data/ias_nfs"
+    "nfs_path": "/home/orion/data/ias_nfs"
   }
 
