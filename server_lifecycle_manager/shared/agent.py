@@ -91,9 +91,11 @@ def run_inference_server(
 
     # Copy files from NFS share to local directories
     # repo = os.path.join(NFS_LOCAL_DIR, "repository", "versioned_models")
-    repo = "/home/vagrant/nfs/repository/versioned_models/my_app/release/v1.0/"
-    app_nfs_path = os.path.join(repo, name, "inference")
-    model_nfs_path = os.path.join(repo, name, "model.pt")
+    app_nfs_path = "/home/vagrant/nfs/repository/versioned_models/my_app/release/v1.0/inference"
+    model_nfs_path = "/home/vagrant/nfs/repository/versioned_models/my_app/release/v1.0/inference/model.pt"
+
+    # app_nfs_path = os.path.join(repo, name, "inference")
+    # model_nfs_path = os.path.join(repo, name, "model.pt")
 
     dest = os.path.join(HOME, name + "_" + version + "_inference")
     model_path = os.path.join(dest, "model.pt")
@@ -145,8 +147,9 @@ def run_webapp_server(name, version, my_ip):
     mount_nfs()
 
     # Copy files from NFS share to local directories
-    repo = os.path.join(NFS_LOCAL_DIR, "repository", "versioned_models")
-    app_nfs_path = os.path.join(repo, name, "webapp")
+    # repo = os.path.join(NFS_LOCAL_DIR, "repository", "versioned_models")
+    # app_nfs_path = os.path.join(repo, name, "webapp")
+    app_nfs_path = "/home/vagrant/nfs/repository/versioned_models/my_app/release/v1.0/web_app"
 
     dest = os.path.join(HOME, name + "_" + version + "_webapp")
 
