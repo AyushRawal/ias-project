@@ -37,6 +37,70 @@ def stop_vm_func(data):
 
         message = f"VM {vm_id} stopped successfully."
         make_log(message)
+        message = {
+            "method": "DELETE",
+            "endpoint": f"/servers/{vm_id}",
+        }
+
+        # register vm
+        send_message_through_kafka(
+            constants["Kafka_Registry_Service_Topic"],
+            message,
+        )
+    else:
+        message = f"VM {vm_id} not found"
+        make_log(message)
+
+
+def start_vm_func(data):
+    if "vm_id" not in data:
+        message = f"Invalid request, missing field: vm_id"
+        make_log(message)
+        return
+    vm_id = data["vm_id"]
+    vm_dir = os.path.join(os.getcwd(), vm_id)
+    if os.path.exists(vm_dir):
+        subprocess.run(["vagrant", "up"], cwd=vm_dir, check=True)
+
+        result = subprocess.run(
+            ["vagrant", "ssh", "-c", "hostname -I"],
+            cwd=vm_dir,
+            capture_output=True,
+            text=True,
+        )
+
+        ips = result.stdout.strip().split()
+        ip = ips[1] if ips else None
+
+        if ip:
+            vm_agent_port = constants["VM_Agent_Port"]
+
+            payload = {
+                "id": vm_id,
+                "ip_address": ip,
+                "port": vm_agent_port,
+            }
+            message = {
+                "method": "POST",
+                "endpoint": "/register_server",
+                "payload": payload,
+            }
+
+            # register vm
+            send_message_through_kafka(
+                constants["Kafka_Registry_Service_Topic"],
+                message,
+            )
+
+            message_log = f"VM started at {ip}:{vm_agent_port}"
+            logger.info(message_log)
+
+            # log
+            make_log(message_log)
+        else:
+            msg = "VM starting failed"
+            make_log(msg)
+            logger.error(msg)
     else:
         message = f"VM {vm_id} not found"
         make_log(message)
@@ -56,12 +120,22 @@ def destroy_vm_func(data):
 
         message = f"VM {vm_id} destroyed successfully."
         make_log(message)
+        message = {
+            "method": "DELETE",
+            "endpoint": f"/servers/{vm_id}",
+        }
+
+        # register vm
+        send_message_through_kafka(
+            constants["Kafka_Registry_Service_Topic"],
+            message,
+        )
     else:
         message = f"VM {vm_id} not found"
         make_log(message)
 
 
-def provision_vm_func():
+def provision_vm_func(data):
     vm_uuid = str(uuid.uuid4())
     vm_dir = os.path.join(os.getcwd(), "vms", vm_uuid)
 
@@ -86,11 +160,12 @@ def provision_vm_func():
     if ip:
         vm_agent_port = constants["VM_Agent_Port"]
 
-        message = {
+        payload = {
             "id": vm_uuid,
             "ip_address": ip,
             "port": vm_agent_port,
         }
+        message = {"method": "POST", "endpoint": "/register_server", "payload": payload}
 
         # register vm
         send_message_through_kafka(
@@ -148,6 +223,7 @@ def create_kafka_topics():
         "Kafka_Provision_VM_Topic",
         "Kafka_Stop_VM_Topic",
         "Kafka_Destroy_VM_Topic",
+        "Kafka_Start_VM_Topic",
     ]
 
     admin_client = KafkaAdminClient(bootstrap_servers=bootstrap_servers)
@@ -232,6 +308,12 @@ if __name__ == "__main__":
             destroy_vm_func,
             "Kafka_Destroy_VM_Consumer_Group_Id",
             "Kafka_Destroy_VM_Topic",
+        ),
+        (
+            "VM Starter Listener",
+            start_vm_func,
+            "Kafka_Start_VM_Consumer_Group_Id",
+            "Kafka_Start_VM_Topic",
         ),
     ]
 

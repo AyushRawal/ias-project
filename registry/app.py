@@ -83,22 +83,24 @@ def init_db():
             type TEXT NOT NULL,
             process_id TEXT NOT NULL,
             started_at INTEGER NOT NULL,
-            UNIQUE(name, version)
+            ip_address TEXT NOT NULL DEFAULT '127.0.0.1',
+            port INTEGER NOT NULL,
+            UNIQUE(ip_address, port)
         )
     """
     )
-    c.execute(
-        """
-        CREATE TABLE IF NOT EXISTS server_applications (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            server_id TEXT NOT NULL,
-            application_id INTEGER NOT NULL,
-            FOREIGN KEY(server_id) REFERENCES servers(id) ON DELETE CASCADE,
-            FOREIGN KEY(application_id) REFERENCES applications(id) ON DELETE CASCADE,
-            UNIQUE(server_id, application_id)
-        )
-    """
-    )
+    # c.execute(
+    #     """
+    #     CREATE TABLE IF NOT EXISTS server_applications (
+    #         id INTEGER PRIMARY KEY AUTOINCREMENT,
+    #         server_id TEXT NOT NULL,
+    #         application_id INTEGER NOT NULL,
+    #         FOREIGN KEY(server_id) REFERENCES servers(id) ON DELETE CASCADE,
+    #         FOREIGN KEY(application_id) REFERENCES applications(id) ON DELETE CASCADE,
+    #         UNIQUE(server_id, application_id)
+    #     )
+    # """
+    # )
     conn.commit()
     conn.close()
     logger.info("Database initialized.")
@@ -122,7 +124,6 @@ def query_db(query: str, args=(), one=False):
 # ——— Business logic (POST/PUT/DELETE) ————————————————————————
 def register_server_logic(data):
     required = ["id", "ip_address", "port"]
-    # required = ["process_id", "port", "application_version", "application_name"]
     for f in required:
         if f not in data:
             msg = f"Invalid register server request, missing field: {f}"
@@ -159,20 +160,35 @@ def register_server_logic(data):
 
 
 def register_application_logic(data):
-    if "name" not in data or "version" not in data:
-        return {"error": "Missing name or version"}, 400
-    name, ver = data["name"], data["version"]
+    required = ["name", "version", "process_id", "type", "ip_address", "port"]
+    for f in required:
+        if f not in data:
+            msg = f"Invalid register server request, missing field: {f}"
+            make_log("registry", msg)
+            return {"error": f"Missing field: {f}"}, 400
+
+    name = data["name"]
+    version = data["version"]
+    process_id = data["process_id"]
+    server_type = data["type"]
+    ip_address = data["ip_address"]
+    port = data["port"]
+
     try:
         conn = sqlite3.connect(DATABASE)
         c = conn.cursor()
         c.execute(
-            "INSERT OR IGNORE INTO applications(name,version) VALUES(?,?)", (name, ver)
+            "INSERT OR IGNORE INTO applications(name,version,process_id,type,ip_address,port) VALUES(?,?,?,?,?,?)",
+            (name, version, process_id, server_type, ip_address, port),
         )
         conn.commit()
-        c.execute("SELECT id FROM applications WHERE name=? AND version=?", (name, ver))
+        c.execute(
+            "SELECT id FROM applications WHERE ip_address=? AND port=?",
+            (ip_address, port),
+        )
         app_id = c.fetchone()[0]
         conn.close()
-        msg = f"Registered application {name} v{ver}"
+        msg = f"Registered application {name} v{version}"
         make_log("registry", msg)
         return {"message": "Application registered", "application_id": app_id}, 201
     except Exception as e:
@@ -197,9 +213,29 @@ def delete_server_logic(server_id):
         return {"error": msg}, 500
 
 
-def delete_application_logic(app_id):
-    # omitted for brevity
-    return {"message": "Not implemented"}, 501
+def delete_application_logic(payload):
+    ip_address = payload["ip_address"]
+    port = payload["port"]
+    try:
+        conn = sqlite3.connect(DATABASE)
+        c = conn.cursor()
+        c.execute(
+            "DELETE FROM applications WHERE ip_address = ? AND port = ?",
+            (ip_address, port),
+        )
+        conn.commit()
+        conn.close()
+        msg = f"Deleted application with IP {ip_address}, Port {port}"
+        make_log("registry", msg)
+        return {
+            "message": "Application deleted",
+            "ip_address": ip_address,
+            "port": port,
+        }, 200
+    except Exception as e:
+        msg = f"Error deleting application: {e}"
+        make_log("registry", msg)
+        return {"error": msg}, 500
 
 
 # ——— Kafka‑consumer dispatcher —————————————————————————————————
@@ -213,16 +249,12 @@ def dispatch_kafka_request(msg):
             return register_server_logic(payload)
         elif endpoint == "/register_application":
             return register_application_logic(payload)
-    elif method == "PUT" and endpoint.startswith("/servers/"):
-        sid = int(endpoint.rsplit("/", 1)[-1])
-        return update_server_logic(sid, payload)
     elif method == "DELETE":
         if endpoint.startswith("/servers/"):
             sid = int(endpoint.rsplit("/", 1)[-1])
             return delete_server_logic(sid)
         elif endpoint.startswith("/applications/"):
-            aid = int(endpoint.rsplit("/", 1)[-1])
-            return delete_application_logic(aid)
+            return delete_application_logic(payload)
 
     return {"error": "Unknown route"}, 400
 

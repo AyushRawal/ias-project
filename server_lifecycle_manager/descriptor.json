@@ -9,6 +9,8 @@
     "Kafka_Provision_VM_Consumer_Group_Id": "Provision_VM_Group",
     "Kafka_Stop_VM_Topic": "Stop_VM",
     "Kafka_Stop_VM_Consumer_Group_Id": "Stop_VM_Group",
+    "Kafka_Start_VM_Topic": "Start_VM",
+    "Kafka_Start_VM_Consumer_Group_Id": "Start_VM_Group",
     "Kafka_Destroy_VM_Topic": "Destroy_VM",
     "Kafka_Destroy_VM_Consumer_Group_Id": "Destroy_VM_Group",
     "Kafka_Registry_Service_Topic": "Registry_Service",
