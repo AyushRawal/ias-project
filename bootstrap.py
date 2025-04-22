@@ -2,9 +2,7 @@ from server_runtime.lifecycle_server import ServerLifeCycleServer
 from server_runtime.registry_server import RegistryServer
 from server_runtime.repository_server import RepositoryServer
 from server_runtime.logging_server import LoggingServer
-from load_balancer_server import LoadBalancerServer
-
-# TODO: start load balancer
+from server_runtime.load_balancer_server import LoadBalancerServer
 
 reg_server = RegistryServer("./registry")
 
