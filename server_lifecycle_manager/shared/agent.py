@@ -22,7 +22,9 @@ kafka_producer = None
 
 url_pid = {}
 
-with open("descriptor.json", "r") as f:
+here = os.path.dirname(__file__)
+
+with open(os.path.join(here, "descriptor.json"), "r") as f:
     constants = json.load(f)
 
 
@@ -87,7 +89,7 @@ def run_inference_server(
     mount_nfs()
 
     # Copy files from NFS share to local directories
-    repo = os.path.join(NFS_LOCAL_DIR, "repository")
+    repo = os.path.join(NFS_LOCAL_DIR, "repository", "versioned_models")
     app_nfs_path = os.path.join(repo, name, "inference")
     model_nfs_path = os.path.join(repo, name, "model.pt")
 
@@ -141,7 +143,7 @@ def run_webapp_server(name, version, my_ip):
     mount_nfs()
 
     # Copy files from NFS share to local directories
-    repo = os.path.join(NFS_LOCAL_DIR, "repository")
+    repo = os.path.join(NFS_LOCAL_DIR, "repository", "versioned_models")
     app_nfs_path = os.path.join(repo, name, "webapp")
 
     dest = os.path.join(HOME, name + "_" + version + "_webapp")
