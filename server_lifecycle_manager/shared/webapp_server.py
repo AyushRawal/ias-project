@@ -4,7 +4,7 @@ import os
 import subprocess
 from urllib.parse import urljoin
 
-from kafka_utils import KafkaLogger, KafkaOutputRedirector
+# from kafka_utils import KafkaLogger, KafkaOutputRedirector
 
 
 class WebAppServer:
@@ -19,19 +19,19 @@ class WebAppServer:
             format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
         )
         self.logger = logging.getLogger(self.server_name)
-        self.kafka_broker = kafka_broker
-        self.kafka_topic_prefix = "logs"
-        self.kafka_logger = None
-        self.output_redirector = None
-
-        # Initialize Kafka logger if broker is provided
-        if self.kafka_broker:
-            self.kafka_logger = KafkaLogger(
-                server_name=self.server_name,
-                broker=self.kafka_broker,
-                topic_prefix=self.kafka_topic_prefix or "server_logs",
-                logger=self.logger,
-            )
+        # self.kafka_broker = kafka_broker
+        # self.kafka_topic_prefix = "logs"
+        # self.kafka_logger = None
+        # self.output_redirector = None
+        #
+        # # Initialize Kafka logger if broker is provided
+        # if self.kafka_broker:
+        #     self.kafka_logger = KafkaLogger(
+        #         server_name=self.server_name,
+        #         broker=self.kafka_broker,
+        #         topic_prefix=self.kafka_topic_prefix or "server_logs",
+        #         logger=self.logger,
+        #     )
 
     def _verify_app_directory(self):
         """Verify that the application directory exists and has required files"""
@@ -153,14 +153,14 @@ class WebAppServer:
                 self.port = self._get_actual_port(proc.stdout)
 
                 # Set up Kafka output redirection if Kafka logger is available
-                if self.kafka_logger:
-                    self.output_redirector = KafkaOutputRedirector(
-                        server_name=self.server_name,
-                        process=proc,
-                        kafka_logger=self.kafka_logger,
-                    )
-                    self.output_redirector.start_redirection()
-                    self.logger.info("Process output being redirected to Kafka")
+                # if self.kafka_logger:
+                #     self.output_redirector = KafkaOutputRedirector(
+                #         server_name=self.server_name,
+                #         process=proc,
+                #         kafka_logger=self.kafka_logger,
+                #     )
+                #     self.output_redirector.start_redirection()
+                #     self.logger.info("Process output being redirected to Kafka")
 
                 self.logger.info(f"Web Application Server started on port {self.port}")
                 return proc.pid, self.port
@@ -187,14 +187,14 @@ class WebAppServer:
                 self.port = self._get_actual_port(proc.stdout)
 
                 # Set up Kafka output redirection if Kafka logger is available
-                if self.kafka_logger:
-                    self.output_redirector = KafkaOutputRedirector(
-                        server_name=self.server_name,
-                        process=proc,
-                        kafka_logger=self.kafka_logger,
-                    )
-                    self.output_redirector.start_redirection()
-                    self.logger.info("Process output being redirected to Kafka")
+                # if self.kafka_logger:
+                #     self.output_redirector = KafkaOutputRedirector(
+                #         server_name=self.server_name,
+                #         process=proc,
+                #         kafka_logger=self.kafka_logger,
+                #     )
+                #     self.output_redirector.start_redirection()
+                #     self.logger.info("Process output being redirected to Kafka")
 
                 self.logger.info(
                     f"Streamlit Web Application Server started on port {self.port}"

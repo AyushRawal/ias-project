@@ -3,7 +3,7 @@ import logging
 import os
 import subprocess
 
-from kafka_utils import KafkaLogger, KafkaOutputRedirector
+# from kafka_utils import KafkaLogger, KafkaOutputRedirector
 
 
 class InferenceAPIServer:
@@ -24,19 +24,19 @@ class InferenceAPIServer:
         self.model_path = model_path
         self.port = 0
         self.workers = workers
-        self.kafka_broker = kafka_broker
-        self.kafka_topic_prefix = "logs"
-        self.kafka_logger = None
-        self.output_redirector = None
+        # self.kafka_broker = kafka_broker
+        # self.kafka_topic_prefix = "logs"
+        # self.kafka_logger = None
+        # self.output_redirector = None
 
         # Initialize Kafka logger if broker is provided
-        if self.kafka_broker:
-            self.kafka_logger = KafkaLogger(
-                server_name=self.server_name,
-                broker=self.kafka_broker,
-                topic_prefix=self.kafka_topic_prefix or "server_logs",
-                logger=self.logger,
-            )
+        # if self.kafka_broker:
+        #     self.kafka_logger = KafkaLogger(
+        #         server_name=self.server_name,
+        #         broker=self.kafka_broker,
+        #         topic_prefix=self.kafka_topic_prefix or "server_logs",
+        #         logger=self.logger,
+        #     )
 
     def _verify_app_directory(self):
         """Verify that the application directory exists and has required files"""
@@ -140,14 +140,14 @@ class InferenceAPIServer:
             self.port = self._get_actual_port(proc.stdout)
 
             # Set up Kafka output redirection if Kafka logger is available
-            if self.kafka_logger:
-                self.output_redirector = KafkaOutputRedirector(
-                    server_name=self.server_name,
-                    process=proc,
-                    kafka_logger=self.kafka_logger,
-                )
-                self.output_redirector.start_redirection()
-                self.logger.info("Process output being redirected to Kafka")
+            # if self.kafka_logger:
+            #     self.output_redirector = KafkaOutputRedirector(
+            #         server_name=self.server_name,
+            #         process=proc,
+            #         kafka_logger=self.kafka_logger,
+            #     )
+            #     self.output_redirector.start_redirection()
+            #     self.logger.info("Process output being redirected to Kafka")
 
             self.logger.info(f"Inference API Server started on port {self.port}")
             return proc.pid, self.port
@@ -164,25 +164,9 @@ if __name__ == "__main__":
     parser.add_argument(
         "--app-dir", required=True, help="Path to the application directory"
     )
-    parser.add_argument("--model-path", required=True, help="Path to the model file")
-    parser.add_argument(
-        "--port", type=int, default=8000, help="Port to run the server on"
-    )
     parser.add_argument(
         "--workers", type=int, default=1, help="Number of worker processes"
     )
-    parser.add_argument(
-        "--kafka-broker",
-        default="10.1.37.28:9092",
-        help="Kafka broker address for output redirection",
-    )
-    parser.add_argument(
-        "--kafka-topic-prefix", default="server_logs", help="Prefix for Kafka topics"
-    )
-    parser.add_argument(
-        "--no-kafka", action="store_true", help="Disable Kafka output redirection"
-    )
-
     args = parser.parse_args()
 
     # Only use Kafka if not explicitly disabled
@@ -191,13 +175,10 @@ if __name__ == "__main__":
     server = InferenceAPIServer(
         app_dir=args.app_dir,
         model_path=args.model_path,
-        port=args.port,
         workers=args.workers,
-        kafka_broker=kafka_broker,
-        kafka_topic_prefix=args.kafka_topic_prefix,
     )
 
-    pid = server.start()
+    pid, port = server.start()
     if pid > 0:
         print(f"Server started with PID: {pid}")
     else:
