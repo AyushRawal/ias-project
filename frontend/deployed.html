@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deployed Models</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .model-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .model-card {
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 2px 2px 5px #eee;
+        }
+        .model-card h3 {
+            margin-top: 0;
+        }
+        .model-info p {
+            margin-bottom: 5px;
+        }
+        .status {
+            font-weight: bold;
+        }
+        .status.online {
+            color: green;
+        }
+        .status.offline {
+            color: red;
+        }
+        .actions button {
+            padding: 8px 15px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+        .actions button.view {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 3px;
+        }
+        .actions button.view:hover {
+            background-color: #45a049;
+        }
+        .actions button.manage {
+            background-color: #008CBA;
+            color: white;
+            border: none;
+            border-radius: 3px;
+        }
+        .actions button.manage:hover {
+            background-color: #007ba7;
+        }
+        .actions button.retire {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 3px;
+        }
+        .actions button.retire:hover {
+            background-color: #da190b;
+        }
+        #error-message {
+            color: red;
+            text-align: center;
+            margin-top: 20px;
+            display: none;
+        }
+        #loading-indicator {
+            text-align: center;
+            margin-top: 20px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <h1>Deployed Machine Learning Models</h1>
+
+    <div id="loading-indicator">Loading Models...</div>
+    <div id="error-message"></div>
+    <div class="model-list" id="model-list">
+        </div>
+
+    <script>
+        const modelListContainer = document.getElementById('model-list');
+        const loadingIndicator = document.getElementById('loading-indicator');
+        const errorMessageDisplay = document.getElementById('error-message');
+
+        // Simulate fetching data from an API
+        function fetchDeployedModels() {
+            // In a real application, you would use the fetch API:
+            // return fetch('/api/models')
+            //   .then(response => response.json());
+
+            // Simulate a successful response after 1 second
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    resolve([
+                        {
+                            id: 'model-sa-0021',
+                            name: 'Sentiment Analysis Model',
+                            version: '2.1',
+                            deploymentDate: '2025-04-15',
+                            status: 'online',
+                            endpoint: 'https://api.example.com/sentiment',
+                            description: 'Analyzes the sentiment of text input.'
+                        },
+                        {
+                            id: 'model-churn-0010',
+                            name: 'Customer Churn Prediction Model',
+                            version: '1.0',
+                            deploymentDate: '2025-03-28',
+                            status: 'online',
+                            endpoint: 'https://api.example.com/churn',
+                            description: 'Predicts the likelihood of customer churn.'
+                        },
+                        {
+                            id: 'model-image-0015',
+                            name: 'Image Classification Model',
+                            version: '1.5',
+                            deploymentDate: '2024-11-20',
+                            status: 'offline',
+                            endpoint: null, // No endpoint for offline models
+                            description: 'Classifies images into predefined categories (Legacy Model).'
+                        }
+                    ]);
+                }, 1000);
+            });
+        }
+
+        // Function to create a model card element
+        function createModelCard(model) {
+            const modelCard = document.createElement('div');
+            modelCard.className = 'model-card';
+
+            const modelInfoHTML = `
+                <h3>${model.name} v${model.version}</h3>
+                <div class="model-info">
+                    <p><strong>ID:</strong> ${model.id}</p>
+                    <p><strong>Version:</strong> ${model.version}</p>
+                    <p><strong>Deployment Date:</strong> ${model.deploymentDate}</p>
+                    <p><strong>Status:</strong> <span class="status ${model.status}">${model.status}</span></p>
+                    <p><strong>Endpoint:</strong> ${model.endpoint ? `<a href="${model.endpoint}" target="_blank">${model.endpoint}</a>` : 'N/A'}</p>
+                    <p><strong>Description:</strong> ${model.description}</p>
+                </div>
+                <div class="actions">
+                    <button class="view" data-model-id="${model.id}">View Details</button>
+                    <button class="manage" data-model-id="${model.id}">Manage</button>
+                    <button class="retire" data-model-id="${model.id}">${model.status === 'offline' ? 'Remove' : 'Retire'}</button>
+                </div>
+            `;
+            modelCard.innerHTML = modelInfoHTML;
+            return modelCard;
+        }
+
+        // Function to handle button clicks (View, Manage, Retire/Remove)
+        function setupButtonHandlers() {
+            modelListContainer.addEventListener('click', (event) => {
+                const clickedButton = event.target;
+                const modelId = clickedButton.dataset.modelId;
+
+                if (!modelId) return; // If the button doesn't have a model ID, do nothing.
+
+                if (clickedButton.classList.contains('view')) {
+                    // Handle View Details action
+                    console.log(`View details for model: ${modelId}`);
+                    // In a real application, you would open a modal or navigate to a details page.
+                    alert(`Viewing details for model: ${modelId}`);
+                } else if (clickedButton.classList.contains('manage')) {
+                    // Handle Manage action
+                    console.log(`Manage model: ${modelId}`);
+                    // In a real application, you would open a management interface.
+                    alert(`Managing model: ${modelId}`);
+
+                } else if (clickedButton.classList.contains('retire')) {
+                    // Handle Retire/Remove action
+                    console.log(`Retire/Remove model: ${modelId}`);
+                    // In a real application, you would send a request to the server to retire or remove the model.
+                    alert(`Retiring/Removing model: ${modelId}`);
+                    // Remove the model card from the DOM
+                    const modelCard = clickedButton.closest('.model-card');
+                    if (modelCard) {
+                        modelCard.remove();
+                    }
+                }
+            });
+        }
+
+        // Main function to fetch and display the models
+        function initializePage() {
+            fetchDeployedModels()
+                .then(models => {
+                    // Hide the loading indicator
+                    loadingIndicator.style.display = 'none';
+                    // Create and append model cards to the list
+                    models.forEach(model => {
+                        const modelCard = createModelCard(model);
+                        modelListContainer.appendChild(modelCard);
+                    });
+                    // Set up event listeners for the buttons
+                    setupButtonHandlers();
+                })
+                .catch(error => {
+                    // Handle errors during the fetch
+                    loadingIndicator.style.display = 'none';
+                    errorMessageDisplay.textContent = 'Failed to load deployed models: ' + error.message;
+                    errorMessageDisplay.style.display = 'block';
+                    console.error('Error fetching models:', error);
+                });
+        }
+
+        // Call the initializePage function when the page loads
+        window.onload = initializePage;
+    </script>
+</body>
+</html>
