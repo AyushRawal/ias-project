@@ -2,3 +2,4 @@
 **/env/**
 **/vms/**
 registry/registry.db
+repository/versioned_models/**
