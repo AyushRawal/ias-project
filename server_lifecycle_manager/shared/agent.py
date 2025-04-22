@@ -31,6 +31,7 @@ with open(os.path.join(here, "descriptor.json"), "r") as f:
 NFS_LOCAL_DIR = "/home/vagrant/nfs"
 HOME = os.environ["HOME"]
 LOAD_BALANCER_URL = "10.1.37.28:5015"
+REPOSITORY_URL = "10.1.37.28:5002"
 
 
 def mount_nfs():
@@ -89,7 +90,8 @@ def run_inference_server(
     mount_nfs()
 
     # Copy files from NFS share to local directories
-    repo = os.path.join(NFS_LOCAL_DIR, "repository", "versioned_models")
+    # repo = os.path.join(NFS_LOCAL_DIR, "repository", "versioned_models")
+    repo = "/home/vagrant/nfs/repository/versioned_models/my_app/release/v1.0 "
     app_nfs_path = os.path.join(repo, name, "inference")
     model_nfs_path = os.path.join(repo, name, "model.pt")
 
