@@ -110,7 +110,7 @@
 }</div>
         </div>
 
-        <form id="upload-form" action="/upload" method="POST" enctype="multipart/form-data">
+        <form id="upload-form" method="POST" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="modelZip">Model Zip File:</label>
                 <input type="file" id="modelZip" name="modelZip" accept=".zip" required>
@@ -140,4 +140,38 @@
     }
     </script>
 </body>
+<script>
+    document.getElementById('upload-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+    
+        const fileInput = document.getElementById('modelZip');
+        const file = fileInput.files[0];
+    
+        if (!file) {
+            alert("Please select a ZIP file.");
+            return;
+        }
+    
+        // Directly make the API call to /tag_release matching the structure in test.py
+        const formData = new FormData();
+        // In test.py, the file is sent with filename and content-type 'application/zip'
+        formData.append('file', file, file.name);
+        // In test.py, 'app' is sent as data parameter
+        formData.append('app', 'my_app'); // Replace with dynamic logic if needed
+
+        console.log('Uploading zip file as app "my_app" to repository service...');
+        const repoResponse = await fetch('http://10.1.37.28:5002/tag_release', {
+            method: 'POST',
+            body: formData
+        });
+    
+        if (repoResponse.ok) {
+            const result = await repoResponse.json();
+            alert("Model uploaded and stored in repository.\n" + JSON.stringify(result, null, 2));
+        } else {
+            const errorText = await repoResponse.text();
+            alert("Repository upload failed: " + errorText);
+        }
+    });
+    </script>    
 </html>

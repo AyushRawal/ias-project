@@ -16,7 +16,7 @@ if not os.path.isfile(zip_path):
     print(f"Error: File '{zip_path}' not found.")
     sys.exit(1)
 
-url = "http://localhost:5002/tag_release"  # Change this if the repository service is running elsewhere
+url = "http://10.1.37.28:5002/tag_release"  # Change this if the repository service is running elsewhere
 
 # Send POST request with zip file
 with open(zip_path, "rb") as f:

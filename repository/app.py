@@ -81,6 +81,30 @@ def get_next_version(app_name: str) -> str:
     return f"v{max(versions)+1}.0"
 
 
+def get_all_models_logic():
+    """Scan VERSIONED_ROOT and return all model files grouped by app."""
+    root = VERSIONED_ROOT
+    if not os.path.isdir(root):
+        err = "No versioned_models directory found"
+        make_log("repository", err)
+        return {"error": err}, 404
+
+    models_by_app = {}
+    for app_name in os.listdir(root):
+        models_dir = os.path.join(root, app_name, "models")
+        if not os.path.isdir(models_dir):
+            continue
+        files = [
+            f for f in os.listdir(models_dir)
+            if os.path.isfile(os.path.join(models_dir, f))
+               and f.lower().endswith((".pt", ".pth"))
+        ]
+        if files:
+            models_by_app[app_name] = files
+
+    return {"models": models_by_app}, 200
+
+
 # ——— Core logic ——————————————————————————————————————————
 def process_tag_release_logic(app_name: str, file_bytes: bytes, filename: str):
     if not app_name or not file_bytes or not filename:
@@ -216,6 +240,19 @@ def tag_release():
 def get_version_paths(app_name, version):
     data, code = get_version_paths_logic(app_name, version)
     return jsonify(data), code
+
+# ——— Listing all uploaded models ———————————————————————————————————————
+
+
+@app.route("/models", methods=["GET"])
+def list_models():
+    """
+    GET /models
+    Returns JSON listing all uploaded model files, grouped by app.
+    """
+    data, code = get_all_models_logic()
+    return jsonify(data), code
+
 
 
 # ——— Kafka dispatcher —————————————————————————————————————
