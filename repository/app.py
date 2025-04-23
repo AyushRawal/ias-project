@@ -16,15 +16,19 @@ from kafka import KafkaConsumer, KafkaProducer
 
 # ——— Load configuration ——————————————————————————————————————
 HERE = os.path.dirname(__file__)
+
 with open(os.path.join(HERE, "descriptor.json"), "r") as cfg_file:
     CONFIG = json.load(cfg_file)
 
 PORT = CONFIG.get("port", 5002)
+
 KAFKA_BROKER = CONFIG.get("kafka_broker", "10.1.37.28:9092")
 LOG_TOPIC = CONFIG.get("kafka_log_topic", "logs")
 CMD_TOPIC = CONFIG.get("kafka_cmd_topic", "repository_commands")
-VERSIONED_ROOT = CONFIG.get("nfs_path", HERE)
-VERSIONED_ROOT = os.path.join(VERSIONED_ROOT, "repository", "versioned_models")
+
+NFS_PATH = CONFIG.get("nfs_path", HERE)
+VERSIONED_ROOT = os.path.join(NFS_PATH, "repository", "versioned_models")
+
 # ——— Logging setup ————————————————————————————————————————
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"

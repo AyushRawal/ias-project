@@ -62,12 +62,25 @@ class InferenceAPIServer:
             dependencies.append("gunicorn")
         if dependencies:
             self.logger.info(f"Installing dependencies: {', '.join(dependencies)}")
+            torch_deps = []
+            norm_deps = []
+            for dep in dependencies:
+                if "torch" in dep:
+                    torch_deps.append(dep)
+                else:
+                    norm_deps.append(dep)
             try:
                 subprocess.run(
                     ["python3", "-m", "venv", "env"], cwd=self.app_dir, check=True
                 )
+                # avoid cuda installation
                 subprocess.run(
-                    ["env/bin/pip", "--no-cache-dir", "install", "-q"] + dependencies,
+                    ["env/bin/pip", "--no-cache-dir", "install", "-q", "--index-url https://download.pytorch.org/whl/cpu"] + torch_deps,
+                    cwd=self.app_dir,
+                    check=True,
+                )
+                subprocess.run(
+                    ["env/bin/pip", "--no-cache-dir", "install", "-q"] + norm_deps,
                     cwd=self.app_dir,
                     check=True,
                 )
