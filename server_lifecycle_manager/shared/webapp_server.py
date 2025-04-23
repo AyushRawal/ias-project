@@ -46,10 +46,9 @@ class WebAppServer:
         import requests
 
         try:
-            import urllib.parse
+            # import urllib.parse
 
-            self.logger.info(self.inference_url)
-            status_url = urllib.parse.urljoin(self.inference_url, 'status')
+            status_url = self.inference_url + '/status'
             self.logger.info(status_url)
             response = requests.get(
                 status_url, timeout=5
