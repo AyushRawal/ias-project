@@ -112,9 +112,9 @@ def run_inference_server(
     server = InferenceAPIServer(dest, model_path)
     pid, port = server.start()
 
-    if pid == -1:
+    if pid < 0:
         logger.info(f"could not start inference server")
-        return
+        raise Exception
 
 
     url_pid[my_ip + ":" + port] = pid
@@ -162,9 +162,9 @@ def run_webapp_server(name, version, my_ip):
     server = WebAppServer(dest, inference_url)
     pid, port = server.start()
 
-    if pid == -1:
+    if pid < 0:
         logger.info(f"could not start webapp server")
-        return
+        raise Exception
 
     url_pid[my_ip + ":" + port] = pid
 

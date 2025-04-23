@@ -75,7 +75,7 @@ class InferenceAPIServer:
                 )
                 # avoid cuda installation
                 subprocess.run(
-                    ["env/bin/pip", "--no-cache-dir", "install", "-q", "--index-url https://download.pytorch.org/whl/cpu"] + torch_deps,
+                    ["env/bin/pip", "--no-cache-dir", "install", "-q", "--index-url", "https://download.pytorch.org/whl/cpu"] + torch_deps,
                     cwd=self.app_dir,
                     check=True,
                 )
