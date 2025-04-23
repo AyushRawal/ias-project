@@ -10,7 +10,7 @@
     "init_module": "app:init_db",
     "kafka_broker": "10.3.8.128:9092",
     "kafka_log_topic": "logs",
-    "kafka_cmd_topic": "registry_commands",
+    "kafka_cmd_topic": "Kafka_Registry_Service_Topic",
     "database": "registry.db"
   }
 
