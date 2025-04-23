@@ -53,4 +53,3 @@ if __name__ == "__main__":
 
     for server_name in args.servers:
         pid = start_server(server_name, base_path)
-        print(f"{server_name} server started with pid: {pid}")
