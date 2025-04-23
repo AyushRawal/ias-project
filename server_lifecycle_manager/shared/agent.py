@@ -117,7 +117,7 @@ def run_inference_server(
         raise Exception
 
 
-    url_pid[my_ip + ":" + port] = pid
+    url_pid[my_ip + ":" + str(port)] = pid
 
     payload = {
         "name": name,
@@ -167,7 +167,7 @@ def run_webapp_server(name, version, my_ip):
         logger.info(f"could not start webapp server")
         raise Exception
 
-    url_pid[my_ip + ":" + port] = pid
+    url_pid[my_ip + ":" + str(port)] = pid
 
     payload = {
         "name": name,
@@ -195,7 +195,7 @@ def stop_service(my_ip, port):
     """Stop a running service by its process ID"""
     if not url_pid[my_ip + ":" + port]:
         logger.warning("no running application found")
-    pid = url_pid[my_ip + ":" + port]
+    pid = url_pid[my_ip + ":" + str(port)]
     cmd = ["sudo", "kill", "-9", str(pid)]
     try:
         subprocess.run(cmd, check=True)
