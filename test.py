@@ -1,8 +1,8 @@
-# test.py
-
 import sys
 import os
 import requests
+from kafka import KafkaProducer
+import json
 
 if len(sys.argv) < 2:
     print("Usage: python test.py <zip_path>")
@@ -10,6 +10,8 @@ if len(sys.argv) < 2:
 
 zip_path = sys.argv[1]
 app_name = "my_app"  # You can customize this or read from descriptor.json inside the zip
+kafka_topic = "Provision_VM"
+kafka_bootstrap_servers = ['10.3.8.128:9092']  # Replace with your Kafka broker address
 
 # Ensure the file exists
 if not os.path.isfile(zip_path):
@@ -30,3 +32,18 @@ with open(zip_path, "rb") as f:
 print(f"Status Code: {response.status_code}")
 print("Response:")
 print(response.json())
+
+# Send message to Kafka topic
+message = "provision"  # You can customize the message payload here
+
+try:
+    producer = KafkaProducer(bootstrap_servers=kafka_bootstrap_servers,
+                             value_serializer=lambda x: json.dumps(x).encode('utf-8'))
+    producer.send(kafka_topic, message)
+    producer.flush()
+    print(f"Message '{message}' sent to Kafka topic '{kafka_topic}'")
+except Exception as e:
+    print(f"Error sending message to Kafka: {e}")
+finally:
+    if 'producer' in locals():
+        producer.close()
