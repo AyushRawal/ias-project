@@ -48,8 +48,11 @@ class WebAppServer:
         try:
             import urllib.parse
 
+            self.logger.info(self.inference_url)
+            status_url = urllib.parse.urljoin(self.inference_url, 'status')
+            self.logger.info(status_url)
             response = requests.get(
-                f"{urllib.parse.urljoin(self.inference_url, 'status')}", timeout=5
+                status_url, timeout=5
             )
             if response.status_code == 200:
                 self.logger.info("Inference API is reachable and functional")
