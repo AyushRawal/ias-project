@@ -72,7 +72,7 @@ After=network.target
 
 [Service]
 WorkingDirectory=/home/vagrant/agent_deployment
-  ExecStart=/home/vagrant/agent_deployment/venv/bin/python agent.py
+ExecStart=/home/vagrant/agent_deployment/env/bin/python agent.py
 ExecStop=/bin/kill -s SIGINT $MAINPID
 Restart=always
 User=vagrant

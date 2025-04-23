@@ -3,6 +3,7 @@ import logging
 import os
 import subprocess
 from urllib.parse import urljoin
+import requests
 
 # from kafka_utils import KafkaLogger, KafkaOutputRedirector
 
@@ -223,7 +224,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Only use Kafka if not explicitly disabled
-    kafka_broker = None if args.no_kafka else args.kafka_broker
+    # kafka_broker = None if args.no_kafka else args.kafka_broker
 
     server = WebAppServer(
         app_dir=args.app_dir,
