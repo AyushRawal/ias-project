@@ -284,12 +284,7 @@ app = Flask(__name__)
 def list_servers():
     rows = query_db(
         """
-        SELECT s.id, s.process_id, s.ip_address, s.port,
-               s.server_type, s.status, s.registered_at,
-               a.name AS application_name, a.version AS application_version
-        FROM servers s
-        JOIN server_applications sa ON s.id = sa.server_id
-        JOIN applications a ON sa.application_id = a.id
+        SELECT * from servers;
     """
     )
     return jsonify([dict(r) for r in rows]), 200
