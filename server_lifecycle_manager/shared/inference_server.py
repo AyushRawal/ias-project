@@ -2,6 +2,7 @@ import json
 import logging
 import os
 import subprocess
+import socket
 
 # from kafka_utils import KafkaLogger, KafkaOutputRedirector
 
@@ -22,7 +23,11 @@ class InferenceAPIServer:
         )
         self.logger = logging.getLogger(self.server_name)
         self.model_path = model_path
-        self.port = 0
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.bind(('localhost', 0))
+        port = sock.getsockname()[1]
+        sock.close()
+        self.port = port
         self.workers = workers
         # self.kafka_broker = kafka_broker
         # self.kafka_topic_prefix = "logs"
@@ -150,7 +155,7 @@ class InferenceAPIServer:
             proc = subprocess.Popen(
                 cmd, cwd=self.app_dir, stdout=subprocess.PIPE, stderr=subprocess.PIPE
             )
-            self.port = self._get_actual_port(proc.stdout)
+            # self.port = self._get_actual_port(proc.stdout)
 
             # Set up Kafka output redirection if Kafka logger is available
             # if self.kafka_logger:

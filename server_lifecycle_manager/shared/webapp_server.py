@@ -4,6 +4,7 @@ import os
 import subprocess
 from urllib.parse import urljoin
 import requests
+import socket
 
 # from kafka_utils import KafkaLogger, KafkaOutputRedirector
 
@@ -14,7 +15,11 @@ class WebAppServer:
         self.config = self._load_config()
         self.server_name = self.__class__.__name__
         self.inference_url = inference_url
-        self.port = 0
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.bind(('localhost', 0))
+        port = sock.getsockname()[1]
+        sock.close()
+        self.port = port
         logging.basicConfig(
             level=logging.INFO,
             format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -187,7 +192,7 @@ class WebAppServer:
                     stderr=subprocess.PIPE,
                     cwd=self.app_dir,
                 )
-                self.port = self._get_actual_port(proc.stdout)
+                # self.port = self._get_actual_port(proc.stdout)
 
                 # Set up Kafka output redirection if Kafka logger is available
                 # if self.kafka_logger:
