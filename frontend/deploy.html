@@ -1,27 +1,206 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Deploy Models</title>
-    <link rel="stylesheet" href="css/style.css">
-     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚙️</text></svg>">
+    <link rel="stylesheet" href="css/style.css"/>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E⚙️%3C/text%3E%3C/svg%3E"/>
+    <style>
+        .model-card {
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 16px;
+            margin-bottom: 16px;
+            background-color: #f9f9f9;
+        }
+        .model-card h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .version-tag {
+            display: inline-block;
+            background-color: #4285f4;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            margin-right: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+        .version-tag:hover {
+            background-color: #3367d6;
+        }
+        #refresh-button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 16px;
+        }
+        #refresh-button:hover {
+            background-color: #45a049;
+        }
+        .deploy-button {
+            background-color: #ff9800;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+        .deploy-button:hover {
+            background-color: #e68a00;
+        }
+        .status-message {
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 16px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <h1>Available Models for Deployment</h1>
-        <p>Select a processed model to deploy it.</p>
+        <p>Select a model version to view details or deploy it.</p>
+
+        <button id="refresh-button">Refresh Model List</button>
 
         <div id="model-list-container">
-            <ul id="model-list">
-                <li id="loading-models">Loading models...</li>
-            </ul>
+            <div id="model-list">
+                <div id="loading-models">Loading models...</div>
+            </div>
         </div>
 
-        <div id="deploy-status" class="status-message" style="display: none;">
-            </div>
+        <div id="deploy-status" class="status-message" style="display: none;"></div>
     </div>
 
-    <script src="js/script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const REPOSITORY_URL = 'http://10.3.8.128:5002';
+            const modelListContainer = document.getElementById('model-list');
+            const deployStatus = document.getElementById('deploy-status');
+            const refreshButton = document.getElementById('refresh-button');
+
+            // Fetch all apps and their model files
+            async function fetchAvailableModels() {
+                modelListContainer.innerHTML = '<div id="loading-models">Loading models...</div>';
+                deployStatus.style.display = 'none';
+
+                try {
+                    const response = await fetch(`${REPOSITORY_URL}/models`);
+                    if (!response.ok) {
+                        throw new Error(`Server returned ${response.status}`);
+                    }
+                    const data = await response.json();
+                    displayModels(data.models || {});
+                } catch (error) {
+                    console.error('Error loading models:', error);
+                    modelListContainer.innerHTML = `<div class="error">Error loading models: ${error.message}</div>`;
+                }
+            }
+
+            // Render the model cards
+            function displayModels(models) {
+                if (Object.keys(models).length === 0) {
+                    modelListContainer.innerHTML = '<div>No models available.</div>';
+                    return;
+                }
+
+                let html = '';
+                for (const [app, versions] of Object.entries(models)) {
+                    html += `
+                        <div class="model-card">
+                            <h3>${app}</h3>
+                            <div class="versions">
+                                ${versions.map(v => `
+                                    <span class="version-tag" data-app="${app}" data-version="${v}">
+                                        ${v}
+                                    </span>
+                                `).join('')}
+                            </div>
+                            <button class="deploy-button" data-app="${app}" data-version="${versions[versions.length-1]}">
+                                Deploy Latest (${versions[versions.length-1]})
+                            </button>
+                        </div>
+                    `;
+                }
+                modelListContainer.innerHTML = html;
+
+                // Tag click: show details
+                document.querySelectorAll('.version-tag').forEach(tag => {
+                    tag.addEventListener('click', () => {
+                        const app = tag.dataset.app;
+                        const version = tag.dataset.version;
+                        showModelDetails(app, version);
+                    });
+                });
+
+                // Deploy click: deploy
+                document.querySelectorAll('.deploy-button').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const app = btn.dataset.app;
+                        const version = btn.dataset.version;
+                        deployModel(app, version);
+                    });
+                });
+            }
+
+            // Show details for one version
+            async function showModelDetails(app, version) {
+                try {
+                    const res = await fetch(`${REPOSITORY_URL}/versions/${app}/${version}`);
+                    if (!res.ok) {
+                        const txt = await res.text();
+                        throw new Error(txt);
+                    }
+                    const d = await res.json();
+                    alert(
+                        `Model Details:\n` +
+                        `App: ${d.app}\n` +
+                        `Version: ${d.version}\n` +
+                        `Model Path: ${d.model_path}\n` +
+                        `Release Path: ${d.release_path}`
+                    );
+                } catch (err) {
+                    showStatus(`Error fetching details: ${err.message}`, 'error');
+                }
+            }
+
+            // Simulate deployment
+            function deployModel(app, version) {
+                showStatus(`Deploying ${app} v${version}…`, 'success');
+                setTimeout(() => {
+                    showStatus(`Successfully deployed ${app} v${version}!`, 'success');
+                }, 2000);
+            }
+
+            // Display a status message
+            function showStatus(msg, type) {
+                deployStatus.textContent = msg;
+                deployStatus.className = `status-message ${type}`;
+                deployStatus.style.display = 'block';
+            }
+
+            // Wire up refresh
+            refreshButton.addEventListener('click', fetchAvailableModels);
+
+            // Initial load
+            fetchAvailableModels();
+        });
+    </script>
 </body>
 </html>
