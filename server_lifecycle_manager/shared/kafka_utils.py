@@ -16,7 +16,7 @@ except ImportError:
     KAFKA_AVAILABLE = False
 
 # Default Kafka configuration
-DEFAULT_KAFKA_BROKER = "10.1.37.28:9092"
+DEFAULT_KAFKA_BROKER = "10.3.8.128:9092"
 DEFAULT_KAFKA_TOPIC_PREFIX = "server_logs"
 
 class KafkaLogger:

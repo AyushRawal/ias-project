@@ -30,8 +30,8 @@ with open(os.path.join(here, "descriptor.json"), "r") as f:
 
 NFS_LOCAL_DIR = "/home/vagrant/nfs"
 HOME = os.environ["HOME"]
-LOAD_BALANCER_URL = "10.1.37.28:5015"
-REPOSITORY_URL = "10.1.37.28:5002"
+LOAD_BALANCER_URL = constants["load_balancer"]
+REPOSITORY_URL = constants["repository"]
 
 
 def mount_nfs():

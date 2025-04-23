@@ -8,9 +8,9 @@
     "port": 5001,
     "app_module": "app:app",
     "init_module": "app:init_db",
-    "kafka_broker": "10.1.37.28:9092",
+    "kafka_broker": "10.3.8.128:9092",
     "kafka_log_topic": "logs",
     "kafka_cmd_topic": "registry_commands",
     "database": "registry.db"
   }
-  
+
