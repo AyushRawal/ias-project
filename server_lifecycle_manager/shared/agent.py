@@ -158,7 +158,7 @@ def run_webapp_server(name, version, my_ip):
     else:
         shutil.copytree(app_nfs_path, dest)
 
-    inference_url = f"{LOAD_BALANCER_URL}/{name}/{version}"
+    inference_url = f"{LOAD_BALANCER_URL}/{name}/{version}/inference"
     logger.info(f"Inference url: {inference_url}")
     server = WebAppServer(dest, inference_url)
     pid, port = server.start()
