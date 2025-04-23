@@ -1,0 +1,9 @@
+{
+  "environment": {
+  },
+  "dependencies": [
+    "flask",
+    "requests"
+  ],
+  "api_module": "app:app"
+}

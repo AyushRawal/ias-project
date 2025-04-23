@@ -1,0 +1,11 @@
+{
+  "environment": {
+  },
+  "dependencies": [
+    "flask",
+    "torch",
+    "torchvision",
+    "pillow"
+  ],
+  "api_module": "app:app"
+}
