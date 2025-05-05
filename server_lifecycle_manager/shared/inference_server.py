@@ -23,11 +23,11 @@ class InferenceAPIServer:
         )
         self.logger = logging.getLogger(self.server_name)
         self.model_path = model_path
-        # sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        # sock.bind(('localhost', 0))
-        # port = sock.getsockname()[1]
-        # sock.close()
-        self.port = 5005
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.bind(('localhost', 0))
+        port = sock.getsockname()[1]
+        sock.close()
+        self.port = port
         self.workers = workers
         # self.kafka_broker = kafka_broker
         # self.kafka_topic_prefix = "logs"
