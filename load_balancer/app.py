@@ -59,7 +59,7 @@ def _get_pool(app_name, version, server_type):
 def proxy_request(target_url):
     try:
         method = request.method
-        headers = {k: v for k, v in request.headers if k != 'Host'}
+        headers = {k: v for k, v in request.headers.items() if k != 'Host'}
         data = request.get_data()
         params = request.args
 
