@@ -1,6 +1,6 @@
 #!/bin/bash
 
-scp -r ./server_lifecycle_manager/agent.py orion@10.3.8.128:~/data/ias_nfs/system
-scp -r ./server_runtime/inference_server.py orion@10.3.8.28:~/data/ias_nfs/system
-scp -r ./server_runtime/webapp_server.py orion@10.3.8.28:~/data/ias_nfs/system
+scp -r ./server_lifecycle_manager/agent.py orion@10.1.37.28:~/data/ias_nfs/system
+scp -r ./server_runtime/inference_server.py orion@10.1.37.28:~/data/ias_nfs/system
+scp -r ./server_runtime/webapp_server.py orion@10.1.37.28:~/data/ias_nfs/system
 

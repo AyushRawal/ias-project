@@ -1,9 +1,9 @@
 {
-    "Kafka_Bootstrap_Server": "10.3.8.128:9092",
+    "Kafka_Bootstrap_Server": "10.1.37.28:9092",
     "Kafka_Registry_Service_Topic": "Registry_Service",
     "Kafka_Logs_Topic": "logs",
-    "nfs_ip": "10.3.8.128",
+    "nfs_ip": "10.1.37.28",
     "nfs_remote_path": "/srv/nfs",
-    "load_balancer": "10.3.8.128:5015",
-    "repository": "10.3.8.128:5002"
+    "load_balancer": "10.1.37.28:5015",
+    "repository": "10.1.37.28:5002"
 }

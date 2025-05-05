@@ -7,7 +7,7 @@
     "app_module": "app:run",
     "nfs_directory": "/home/orion/data/ias_nfs",
     "kafka_broker": [
-        "10.3.8.128:9092"
+        "10.1.37.28:9092"
     ],
     "kafka_topic": "logs",
     "kafka_group_id": "log_consumer_group"

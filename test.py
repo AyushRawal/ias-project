@@ -14,15 +14,15 @@ app_name = (
     "my_app"  # You can customize this or read from descriptor.json inside the zip
 )
 kafka_topic = "Provision_VM"
-kafka_bootstrap_servers = ["10.3.8.128:9092"]  # Replace with your Kafka broker address
-servers_api_url = "http://10.3.8.128:5001/servers"  # URL for the servers API
+kafka_bootstrap_servers = ["10.1.37.28:9092"]  # Replace with your Kafka broker address
+servers_api_url = "http://10.1.37.28:5001/servers"  # URL for the servers API
 
 # Ensure the file exists
 if not os.path.isfile(zip_path):
     print(f"Error: File '{zip_path}' not found.")
     sys.exit(1)
 
-repository_url = "http://10.3.8.128:5002/tag_release"  # Change this if the repository service is running elsewhere
+repository_url = "http://10.1.37.28:5002/tag_release"  # Change this if the repository service is running elsewhere
 
 
 # Send POST request with zip file

@@ -25,7 +25,7 @@ except Exception as e:
     CONFIG = {}
 
 # Kafka configuration
-KAFKA_BROKERS = CONFIG.get("kafka_brokers", ["10.3.8.128:9092"])
+KAFKA_BROKERS = CONFIG.get("kafka_brokers", ["10.1.37.28:9092"])
 KAFKA_TOPIC = CONFIG.get("kafka_topic", "logs")
 KAFKA_GROUP = CONFIG.get("kafka_group", "log_consumer_group")
 
