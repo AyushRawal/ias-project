@@ -202,6 +202,12 @@ def delete_server_logic(server_id):
     try:
         conn = sqlite3.connect(DATABASE)
         c = conn.cursor()
+        # first delete all the applications running on this server
+        c.execute(
+            "DELETE FROM applications WHERE ip_address = (SELECT ip_address FROM servers WHERE id = ?)",
+            (server_id,),
+        )
+        # then delete the server
         c.execute("DELETE FROM servers WHERE id = ?", (server_id,))
         conn.commit()
         conn.close()
@@ -252,7 +258,7 @@ def dispatch_kafka_request(msg):
             return register_application_logic(payload)
     elif method == "DELETE":
         if endpoint.startswith("/servers/"):
-            sid = int(endpoint.rsplit("/", 1)[-1])
+            sid = endpoint.rsplit("/", 1)[-1]
             return delete_server_logic(sid)
         elif endpoint.startswith("/applications/"):
             return delete_application_logic(payload)
