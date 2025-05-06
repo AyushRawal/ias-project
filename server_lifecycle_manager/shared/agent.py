@@ -223,6 +223,7 @@ def run_webapp_server(name, version, my_ip):
         message,
     )
     logger.info(f"Webapp started at {my_ip}:{port}")
+    return pid
 
 
 def stop_service(my_ip, port):

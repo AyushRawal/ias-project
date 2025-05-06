@@ -158,7 +158,7 @@ class WebAppServer:
                     stderr=subprocess.PIPE,
                 )
 
-                self.port = self._get_actual_port(proc.stdout)
+                # self.port = self._get_actual_port(proc.stdout)
 
                 # Set up Kafka output redirection if Kafka logger is available
                 # if self.kafka_logger:
