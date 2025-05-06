@@ -301,30 +301,21 @@ def list_applications():
 def get_application_url():
     name = request.args.get("name")
     version = request.args.get("version")
-    if not name or not version:
-        return jsonify({"error": "name and version required"}), 400
+    server_type = request.args.get("server_type")
+    if not name or not version or not server_type:
+        return jsonify({"error": "name, version and server_type required"}), 400
     row = query_db(
         """
-        SELECT s.ip_address, s.port
-        FROM servers s
-        JOIN server_applications sa ON s.id = sa.server_id
-        JOIN applications a ON sa.application_id = a.id
-        WHERE a.name = ? AND a.version = ? AND s.status='active'
-        LIMIT 1
+        SELECT ip_address, port
+        FROM applications
+        WHERE name = ? AND version = ? AND type = ?
     """,
-        (name, version),
-        one=True,
+        (name, version, server_type),
     )
     if not row:
         return jsonify({"error": "Not found"}), 404
     return (
-        jsonify(
-            {
-                "ip_address": row["ip_address"],
-                "port": row["port"],
-                "url": f"http://{row['ip_address']}:{row['port']}",
-            }
-        ),
+        jsonify(row),
         200,
     )
 

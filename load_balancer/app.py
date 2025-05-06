@@ -37,17 +37,17 @@ def _get_pool(app_name, version, server_type):
         if key not in _pools:
             logger.info(f"Fetching pool for {key}")
             resp = requests.get(
-                f"{REG_URL}/servers_by_application",
-                params={"name": app_name, "version": version}
+                f"{REG_URL}/get_application_url",
+                params={"name": app_name, "version": version, "server_type": server_type}
             )
             if resp.status_code != 200:
                 logger.warning(f"Failed to fetch servers for {key}")
                 return None
             servers = resp.json()
+            print(servers)
             targets = [
                 f"http://{s['ip_address']}:{s['port']}"
                 for s in servers
-                if s["server_type"] == server_type and s["status"] == "active"
             ]
             if not targets:
                 logger.warning(f"No active {server_type} servers for {app_name}:{version}")
