@@ -141,7 +141,7 @@ def provision_vm_func(data):
 
     vm_dir = os.path.join(os.getcwd(), vm_dir)
 
-    os.makedirs(vm_dir, exist_ok=True)
+    # os.makedirs(vm_dir, exist_ok=True)
     # shutil.copy("shared/agent.py", vm_dir)
     # shutil.copy("shared/Vagrantfile", vm_dir)
     shutil.copytree("shared", vm_dir)
