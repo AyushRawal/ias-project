@@ -304,7 +304,7 @@ def get_application_url():
     server_type = request.args.get("server_type")
     if not name or not version or not server_type:
         return jsonify({"error": "name, version and server_type required"}), 400
-    row = query_db(
+    rows = query_db(
         """
         SELECT ip_address, port
         FROM applications
@@ -312,7 +312,7 @@ def get_application_url():
     """,
         (name, version, server_type),
     )
-    if not row:
+    if not rows:
         return jsonify({"error": "Not found"}), 404
     return jsonify([dict(r) for r in rows]), 200
 

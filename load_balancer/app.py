@@ -82,21 +82,23 @@ def proxy_request(target_url):
 
 # —— Routes —————————————————————————————————————
 
-@app.route("/<app_name>/<version>/inference", methods=["GET", "POST", "PUT", "DELETE"])
-def route_inference(app_name, version):
+@app.route("/<app_name>/<version>/inference", defaults={"path": ""}, methods=["GET", "POST", "PUT", "DELETE"])
+@app.route("/<app_name>/<version>/inference/<path:path>", methods=["GET", "POST", "PUT", "DELETE"])
+def route_inference(app_name, version, path):
     pool = _get_pool(app_name, version, "inference")
     if not pool:
         return jsonify({"error": "No inference server available"}), 503
     target = next(pool)
-    return proxy_request(f"{target}/inference")
+    return proxy_request(f"{target}/{path}")
 
-@app.route("/<app_name>/<version>", methods=["GET", "POST", "PUT", "DELETE"])
-def route_webapp(app_name, version):
+@app.route("/<app_name>/<version>", defaults={"path": ""}, methods=["GET", "POST", "PUT", "DELETE"])
+@app.route("/<app_name>/<version>/<path:path>", methods=["GET", "POST", "PUT", "DELETE"])
+def route_webapp(app_name, version, path):
     pool = _get_pool(app_name, version, "webapp")
     if not pool:
         return jsonify({"error": "No webapp server available"}), 503
     target = next(pool)
-    return proxy_request(f"{target}/")
+    return proxy_request(f"{target}/{path}")
 
 @app.route("/get_endpoint", methods=["GET"])
 def get_endpoint():
