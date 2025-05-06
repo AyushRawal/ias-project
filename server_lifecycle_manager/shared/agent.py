@@ -291,12 +291,28 @@ def api_stop_service():
         data = request.get_json()
         ip = data.get("ip")
         port = data.get("port")
+        port = str(port)
 
         if not ip or not port:
             return jsonify({"error": "Missing required parameter: ip or port"}), 400
 
         success = stop_service(ip, port)
         if success:
+            payload = {
+                "port": port,
+                "ip_address": ip,
+            }
+            message = {
+                "method": "DELETE",
+                "endpoint": f"/applications",
+                "payload": payload,
+            }
+
+            # register vm
+            send_message_through_kafka(
+                constants["Kafka_Registry_Service_Topic"],
+                message,
+            )
             return (
                 jsonify({"message": f"Service at {ip}:{port} stopped successfully"}),
                 200,
