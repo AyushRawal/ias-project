@@ -314,10 +314,7 @@ def get_application_url():
     )
     if not row:
         return jsonify({"error": "Not found"}), 404
-    return (
-        jsonify(row),
-        200,
-    )
+    return jsonify([dict(r) for r in rows]), 200
 
 
 # ——— Kick off Kafka consumer on import ————————————————————————
