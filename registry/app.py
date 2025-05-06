@@ -282,6 +282,38 @@ def start_kafka_consumer():
     except Exception as e:
         logger.error(f"Kafka consumer failed: {e}")
 
+def get_first_underutilized_server(threshold: int = 2):
+    """
+    Fetch the first server that has fewer than <threshold> applications.
+
+    Args:
+        threshold (int): maximum number of apps a server may have to qualify
+                         (default = 2).
+
+    Returns:
+        dict | None: the server row plus 'app_count', or None if none found.
+    """
+    row = query_db(
+        """
+        SELECT
+            s.id,
+            s.ip_address,
+            s.port,
+            s.registered_at,
+            COUNT(a.id) AS app_count
+        FROM servers AS s
+        LEFT JOIN applications AS a
+               ON s.ip_address = a.ip_address
+              AND s.port       = a.port
+        GROUP BY s.id
+        HAVING app_count < ?
+        LIMIT 1
+        """,
+        (threshold,),
+        one=True,          # query_db will return only the first row
+    )
+    return dict(row) if row else None
+
 
 # ——— Flask app & HTTP GET endpoints ——————————————————————————————
 app = Flask(__name__)
@@ -321,6 +353,15 @@ def get_application_url():
     if not rows:
         return jsonify({"error": "Not found"}), 404
     return jsonify([dict(r) for r in rows]), 200
+
+@app.route("/servers/underutilised/first", methods=["GET"])
+def first_underutilised_server():
+    # Optional query‑param ?threshold=3  (default = 2)
+    threshold = int(request.args.get("threshold", 2))
+    server = get_first_underutilized_server(threshold)
+    if server:
+        return jsonify(server), 200
+    return jsonify({"error": "Not found"}), 404
 
 
 # ——— Kick off Kafka consumer on import ————————————————————————
