@@ -31,7 +31,7 @@ def stop_vm_func(data):
         make_log(message)
         return
     vm_id = data["vm_id"]
-    vm_dir = os.path.join(os.getcwd(), vm_id)
+    vm_dir = os.path.join(os.getcwd(), "vms", vm_id)
     if os.path.exists(vm_dir):
         subprocess.run(["vagrant", "halt"], cwd=vm_dir, check=True)
 
@@ -58,7 +58,7 @@ def start_vm_func(data):
         make_log(message)
         return
     vm_id = data["vm_id"]
-    vm_dir = os.path.join(os.getcwd(), vm_id)
+    vm_dir = os.path.join(os.getcwd(), "vms", vm_id)
     if os.path.exists(vm_dir):
         subprocess.run(["vagrant", "up"], cwd=vm_dir, check=True)
 
@@ -112,7 +112,7 @@ def destroy_vm_func(data):
         make_log(message)
         return
     vm_id = data["vm_id"]
-    vm_dir = os.path.join(os.getcwd(), vm_id)
+    vm_dir = os.path.join(os.getcwd(), "vms", vm_id)
     if os.path.exists(vm_dir):
         subprocess.run(["vagrant", "halt"], cwd=vm_dir, check=True)
         subprocess.run(["vagrant", "destroy", "-f"], cwd=vm_dir, check=True)
@@ -139,7 +139,7 @@ def provision_vm_func(data):
     vm_uuid = str(uuid.uuid4())
     vm_dir = os.path.join(os.getcwd(), "vms", vm_uuid)
 
-    vm_dir = os.path.join(os.getcwd(), vm_dir)
+    # vm_dir = os.path.join(os.getcwd(), vm_dir)
 
     # os.makedirs(vm_dir, exist_ok=True)
     # shutil.copy("shared/agent.py", vm_dir)
