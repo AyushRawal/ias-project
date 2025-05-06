@@ -4,6 +4,8 @@ import os
 import shutil
 import subprocess
 
+import requests
+
 from flask import Flask, jsonify, request
 from kafka import KafkaConsumer, KafkaProducer
 
@@ -91,8 +93,24 @@ def run_inference_server(
 
     # Copy files from NFS share to local directories
     # repo = os.path.join(NFS_LOCAL_DIR, "repository", "versioned_models")
-    app_nfs_path = "/home/vagrant/nfs/repository/versioned_models/my_app/release/v1.0/inference"
-    model_nfs_path = "/home/vagrant/nfs/repository/versioned_models/my_app/models/model.pt"
+
+
+    data = requests.get(f"{REPOSITORY_URL}/versions/{name}/{version}")
+    if data.status_code != 200:
+        print(f"Failed querying repository. Response status code: {data.status_code}")
+        raise Exception
+
+    data = data.json()
+    app_nfs_path = data["release_path"]
+    model_nfs_path = data["model_path"]
+    app_nfs_path = app_nfs_path.replace("/home/orion/data/ias_nfs", NFS_LOCAL_DIR)
+    model_nfs_path = model_nfs_path.replace("/home/orion/data/ias_nfs", NFS_LOCAL_DIR)
+
+    app_nfs_path = os.path.join(app_nfs_path, "inference")
+    model_nfs_path = os.path.join(model_nfs_path, "model.pt")
+
+    # app_nfs_path = "/home/vagrant/nfs/repository/versioned_models/my_app/release/v1.0/inference"
+    # model_nfs_path = "/home/vagrant/nfs/repository/versioned_models/my_app/models/model.pt"
 
     # app_nfs_path = os.path.join(repo, name, "inference")
     # model_nfs_path = os.path.join(repo, name, "model.pt")
@@ -139,6 +157,7 @@ def run_inference_server(
         message,
     )
     logger.info(f"inference started at {my_ip}:{port}")
+    return pid
 
 
 def run_webapp_server(name, version, my_ip):
@@ -146,10 +165,24 @@ def run_webapp_server(name, version, my_ip):
     logger.info(f"Starting webapp server for {name}")
     mount_nfs()
 
+    data = requests.get(f"{REPOSITORY_URL}/versions/{name}/{version}")
+    if data.status_code != 200:
+        print(f"Failed querying repository. Response status code: {data.status_code}")
+        raise Exception
+
+    data = data.json()
+    app_nfs_path = data["release_path"]
+    model_nfs_path = data["model_path"]
+    app_nfs_path = app_nfs_path.replace("/home/orion/data/ias_nfs", NFS_LOCAL_DIR)
+    # model_nfs_path = model_nfs_path.replace("/home/orion/data/ias_nfs", NFS_LOCAL_DIR)
+
+    app_nfs_path = os.path.join(app_nfs_path, "web_app")
+    # model_nfs_path = os.path.join(model_nfs_path, "model.pt")
     # Copy files from NFS share to local directories
     # repo = os.path.join(NFS_LOCAL_DIR, "repository", "versioned_models")
     # app_nfs_path = os.path.join(repo, name, "webapp")
-    app_nfs_path = "/home/vagrant/nfs/repository/versioned_models/my_app/release/v1.0/web_app"
+
+    # app_nfs_path = "/home/vagrant/nfs/repository/versioned_models/my_app/release/v1.0/web_app"
 
     dest = os.path.join(HOME, name + "_" + version + "_webapp")
 
@@ -158,8 +191,8 @@ def run_webapp_server(name, version, my_ip):
     else:
         shutil.copytree(app_nfs_path, dest)
 
-    # inference_url = f"{LOAD_BALANCER_URL}/{name}/{version}/inference"
-    inference_url = f"{my_ip}:5005"
+    inference_url = f"{LOAD_BALANCER_URL}/{name}/{version}/inference"
+    # inference_url = f"{my_ip}:5005"
     logger.info(f"Inference url: {inference_url}")
     server = WebAppServer(dest, inference_url)
     pid, port = server.start()

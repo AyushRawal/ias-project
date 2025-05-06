@@ -41,7 +41,7 @@ class RepositoryServer:
     def start(self):
         self.logger.info("Starting RepositoryServer")
         if not self._setup_env():
-            return -1
+            return -1, 0
 
         # No init_module (our descriptor.json has it null), so skip.
 
@@ -52,4 +52,4 @@ class RepositoryServer:
         self.logger.info(f"Executing: {' '.join(cmd)}")
         proc = subprocess.Popen(cmd, cwd=self.app_dir)
         self.logger.info(f"RepositoryServer started on port {port} (PID={proc.pid})")
-        return proc.pid
+        return proc.pid, port
