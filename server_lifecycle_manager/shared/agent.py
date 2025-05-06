@@ -147,7 +147,7 @@ def run_inference_server(
     }
     message = {
         "method": "POST",
-        "endpoint": f"/register_application/",
+        "endpoint": f"/register_application",
         "payload": payload,
     }
 
@@ -172,7 +172,7 @@ def run_webapp_server(name, version, my_ip):
 
     data = data.json()
     app_nfs_path = data["release_path"]
-    model_nfs_path = data["model_path"]
+    # model_nfs_path = data["model_path"]
     app_nfs_path = app_nfs_path.replace("/home/orion/data/ias_nfs", NFS_LOCAL_DIR)
     # model_nfs_path = model_nfs_path.replace("/home/orion/data/ias_nfs", NFS_LOCAL_DIR)
 
@@ -213,7 +213,7 @@ def run_webapp_server(name, version, my_ip):
     }
     message = {
         "method": "POST",
-        "endpoint": f"/register_application/",
+        "endpoint": f"/register_application",
         "payload": payload,
     }
 
