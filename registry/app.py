@@ -3,7 +3,7 @@ import logging
 import os
 import sqlite3
 import threading
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 
 from flask import Flask, jsonify, request
 from kafka import KafkaConsumer, KafkaProducer
@@ -173,13 +173,14 @@ def register_application_logic(data):
     server_type = data["type"]
     ip_address = data["ip_address"]
     port = data["port"]
+    started_at = datetime.now()
 
     try:
         conn = sqlite3.connect(DATABASE)
         c = conn.cursor()
         c.execute(
-            "INSERT OR IGNORE INTO applications(name,version,process_id,type,ip_address,port) VALUES(?,?,?,?,?,?)",
-            (name, version, process_id, server_type, ip_address, port),
+            "INSERT INTO applications(name,version,process_id,type,ip_address,port,started_at) VALUES(?,?,?,?,?,?,?)",
+            (name, version, process_id, server_type, ip_address, port, started_at),
         )
         conn.commit()
         c.execute(
